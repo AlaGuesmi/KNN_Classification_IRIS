@@ -12,16 +12,16 @@ The goal is to classify iris flowers based on their features (sepal length/width
 
   Shuffle the rows of the Iris dataset to ensure randomness and avoid bias.
 
-3. Normalize the data
+2. Normalize the data
    
   Apply Min-Max standardization to scale the numeric features between 0 and 1.
 
-5. Split the dataset
+3. Split the dataset
    
   Divide the dataset into a training set and a test set to build and evaluate the model.
 
-7. Run the KNN algorithm
-  Use KNN to classify each test observation based on the training data.
+4. Run the KNN algorithm
+   Use KNN to classify each test observation based on the training data.
 
-8. Evaluate model performance
-  Assess the global accuracy and performance of the KNN classification results.
+5. Evaluate model performance
+   Assess the global accuracy and performance of the KNN classification results.
