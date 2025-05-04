@@ -1,0 +1,112 @@
+---
+title: "Iris Classification with KNN Algorithm"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+ 
+## Step 1: Mixture at random the data rows
+
+```{r}
+IR=iris[sample(1:nrow(iris),150,replace=F),]
+str(IR)
+```
+
+## Step 2: 
+First, we make the scaling function. The scaling formula for a given vector $X=x_1,\ldots,x_n$ is given by: 
+
+$$
+Y=\frac{x_i - min(X)}{max(X)-min(X)}
+$$
+
+```{r}
+MinMaxSclae=function(X)
+{
+  (X-min(X,na.rm = T))/(max(X,na.rm = T)-min(X,na.rm = T))
+  }
+
+```
+
+Next, we use the function below to scale our main data. 
+
+```{r}
+DATA.iris=sapply(IR[-5], FUN = MinMaxSclae)
+str(DATA.iris)
+```
+
+## Step 3: Divide the data into train and test set
+
+```{r}
+ind=sample(1:2,150,replace = T)
+Data.test=DATA.iris[ind==1,]
+Data.train=DATA.iris[ind==2,]
+cl.train=IR[ind==2,5]
+cl.test=IR[ind==1,5]
+```
+
+## Step 4: Run the KNN algorithm
+Here we can try KNN with many value of 'k'. But, in a first trial we fix k=3.
+
+```{r}
+library(class)
+predic.test=knn(train = Data.train,test = Data.test,cl = cl.train,k = 3 )
+```
+
+## Step 5: Assess the global accuracy of the model
+The accuracy is assessed by analyzing the cross table between the reel and predicted class label of the test set. 
+
+```{r}
+TC=table(cl.test,predic.test)
+```
+
+The golobal accuracy is equal to fraction of right predictions. 
+
+```{r}
+print("The global accracy of the KNN is")
+print(sum(diag(TC))/sum(TC))
+```
+
+
+
+
+# Choice of k? 
+We will try many value of k (1,...,12) and then choose the value which gives the best accuracy. For 3000 example of test and training dataset we will test the average accuracy of the model for different value of k. 
+
+```{r}
+Ret=NULL
+for(i in 1:3000)
+{
+  ind=sample(1:2,150,replace = T)
+  Data.test=DATA.iris[ind==1,]
+  Data.train=DATA.iris[ind==2,]
+  cl.train=IR[ind==2,5]
+  cl.test=IR[ind==1,5]
+  
+  accu=c()
+  for(kk in 1:12)
+  {
+  predic.test=knn(train = Data.train,test = Data.test,cl = cl.train,k = kk )
+  TC=table(cl.test,predic.test)
+  accu=c(accu,(sum(diag(TC))/sum(TC)))
+  }
+  Ret=rbind(Ret,accu)
+}
+ACCU=colMeans(Ret)
+plot.new()
+plot(1:12,ACCU,type="l",col=2,xlab="Value of k",ylab="Accuracy")
+which.max(ACCU)
+
+```
+
+
+According to this graph we conclude that that the best accuracy is gotten by k=5. 
+
+# prediction for a single observation
+Imagine that we have a new observation with coordinate (-1.2,1.5,0.3,0.5). We assume that this observation has been sclaed. So, to which class it should belong?
+
+```{r}
+xnew=c(-1.2,1.5,0.3,0.5)
+knn(train = Data.train,test = xnew,cl = cl.train,k = 5 )
+```
+
